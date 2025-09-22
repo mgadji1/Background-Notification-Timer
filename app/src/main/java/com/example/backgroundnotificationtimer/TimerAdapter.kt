@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import androidx.core.graphics.toColorInt
 
 class TimerAdapter(
     private val layoutInflater: LayoutInflater
@@ -28,7 +27,12 @@ class TimerAdapter(
         val timer = timers[position]
 
         holder.tvName.text = timer.name
-        holder.tvStatus.text = timer.status
+        holder.tvStatus.text = when (timer.status) {
+            TimerStatus.CREATED -> "Created"
+            TimerStatus.RUNNING -> "Running"
+            TimerStatus.PAUSED -> "Paused"
+            TimerStatus.FINISHED -> "Finished"
+        }
         holder.tvTime.text = timer.time
 
         holder.btnPlayAndPause.setOnClickListener {
