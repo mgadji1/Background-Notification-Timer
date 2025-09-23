@@ -4,6 +4,7 @@ import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageButton
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 
@@ -27,12 +28,9 @@ class TimerAdapter(
         val timer = timers[position]
 
         holder.tvName.text = timer.name
-        holder.tvStatus.text = when (timer.status) {
-            TimerStatus.CREATED -> "Created"
-            TimerStatus.RUNNING -> "Running"
-            TimerStatus.PAUSED -> "Paused"
-            TimerStatus.FINISHED -> "Finished"
-        }
+
+        TimerStatusEditor.changeStatus(timer.status, holder.tvStatus, holder.itemView)
+
         holder.tvTime.text = timer.time
 
         holder.btnPlayAndPause.setOnClickListener {
@@ -41,18 +39,36 @@ class TimerAdapter(
                     val color = ContextCompat.getColor(holder.itemView.context, R.color.blue_pause)
                     setListener(holder.btnPlayAndPause, R.drawable.pause,
                         ColorStateList.valueOf(color), "pause")
+
+                    timer.status = TimerStatus.RUNNING
+
+                    TimerStatusEditor.changeStatus(timer.status, holder.tvStatus, holder.itemView)
                 }
 
                 "pause" -> {
                     val color = ContextCompat.getColor(holder.itemView.context, R.color.green_play)
                     setListener(holder.btnPlayAndPause, R.drawable.play,
                         ColorStateList.valueOf(color), "play")
+
+                    timer.status = TimerStatus.PAUSED
+
+                    TimerStatusEditor.changeStatus(timer.status, holder.tvStatus, holder.itemView)
                 }
             }
         }
 
-        holder.btnStop.setOnClickListener {
+        holder.btnDelete.setOnClickListener {
+            val dialog = AlertDialog.Builder(holder.itemView.context)
+                .setTitle("Delete this item?")
+                .setPositiveButton("Yes") { dialog, _ ->
+                    removeItem(holder.bindingAdapterPosition)
+                    dialog.dismiss()
+                }
+                .setNegativeButton("No") { dialog, _ ->
+                    dialog.cancel()
+                }.create()
 
+            dialog.show()
         }
     }
 
@@ -61,6 +77,11 @@ class TimerAdapter(
     fun addTimer(timer : Timer) {
         timers.add(timer)
         notifyItemInserted(timers.lastIndex)
+    }
+
+    fun removeItem(position: Int) {
+        timers.removeAt(position)
+        notifyItemRemoved(position)
     }
 
     private fun setListener(imageButton : ImageButton, imageResource : Int,

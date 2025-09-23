@@ -11,5 +11,5 @@ class TimerViewHolder(containerView : View) : RecyclerView.ViewHolder(containerV
     val tvTime = containerView.findViewById<TextView>(R.id.tvTime)
 
     val btnPlayAndPause = containerView.findViewById<ImageButton>(R.id.btnPlayAndPause)
-    val btnStop = containerView.findViewById<ImageButton>(R.id.btnStop)
+    val btnDelete = containerView.findViewById<ImageButton>(R.id.btnDelete)
 }

@@ -2,6 +2,6 @@ package com.example.backgroundnotificationtimer
 
 data class Timer(
     val name : String,
-    val status : TimerStatus,
+    var status : TimerStatus,
     val time : String
 )

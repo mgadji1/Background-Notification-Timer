@@ -34,12 +34,13 @@ class TimersFragment : Fragment() {
         btnAdd.setOnClickListener {
             parentFragmentManager
                 .beginTransaction()
-                .replace(R.id.fragment_container, NewTimerFragment.newInstance())
+                .hide(this)
+                .add(R.id.fragment_container, NewTimerFragment.newInstance())
                 .addToBackStack(null)
                 .commit()
         }
 
-        parentFragmentManager.setFragmentResultListener(NEW_TIMER_RESULT_KEY, this) { _, bundle ->
+        parentFragmentManager.setFragmentResultListener(NEW_TIMER_RESULT_KEY, viewLifecycleOwner) { _, bundle ->
             createTimer(bundle)
         }
     }

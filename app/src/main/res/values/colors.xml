@@ -5,4 +5,9 @@
 
     <color name="blue_pause">#26F6EF</color>
     <color name="green_play">#62C528</color>
+
+    <color name="created_state">#D0D531</color>
+    <color name="running_state">#30EE1A</color>
+    <color name="paused_state">#1A92EE</color>
+    <color name="finished_state">#2B242A</color>
 </resources>

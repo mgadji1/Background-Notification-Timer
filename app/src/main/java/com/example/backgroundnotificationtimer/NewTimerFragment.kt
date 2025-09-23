@@ -44,7 +44,12 @@ class NewTimerFragment : Fragment() {
             val name = edTimerName.text.toString()
 
             if (name.isNotEmpty()) {
-                sendResult(name, timePickerSeconds, timePickerMinutes, timePickerHours)
+                if (timePickerSeconds.value > 0 || timePickerMinutes.value > 0 || timePickerHours.value > 0) {
+                    sendResult(name, timePickerSeconds, timePickerMinutes, timePickerHours)
+                } else {
+                    Toast.makeText(requireContext(), "Set correct time", Toast.LENGTH_SHORT)
+                        .show()
+                }
             } else {
                 Toast.makeText(requireContext(), "Name cannot be empty", Toast.LENGTH_SHORT)
                     .show()
