@@ -1,17 +1,50 @@
 package com.example.backgroundnotificationtimer
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import java.util.Locale
+import java.util.UUID
 
 class TimersFragment : Fragment() {
+
+    private val timeReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val timer = intent?.getParcelableExtra<Timer>(UPDATED_TIMER_KEY)
+            val newTime = intent?.getStringExtra(UPDATED_TIMER_NEW_TIME_KEY)
+
+            if (timer != null && newTime != null) {
+                adapter.updateTimer(timer, newTime)
+            }
+        }
+    }
     private lateinit var adapter : TimerAdapter
+
+    override fun onStart() {
+        super.onStart()
+        ContextCompat.registerReceiver(
+            requireContext(),
+            timeReceiver,
+            IntentFilter("timer_updated"),
+            ContextCompat.RECEIVER_EXPORTED
+        )
+    }
+
+    override fun onStop() {
+        super.onStop()
+        requireContext().unregisterReceiver(timeReceiver)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,6 +59,9 @@ class TimersFragment : Fragment() {
         adapter = TimerAdapter(layoutInflater)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
+
+        (recyclerView.itemAnimator as? SimpleItemAnimator)?.supportsChangeAnimations = false
+
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
@@ -56,13 +92,16 @@ class TimersFragment : Fragment() {
 
         val time = "${formatTime(hours)}:${formatTime(minutes)}:${formatTime(seconds)}"
 
+        val id = generateTimerId()
+
         val newTimer = Timer(
+            id,
             name,
             status,
             time
         )
 
-        adapter.addTimer(newTimer)
+        adapter.addTimer(newTimer, requireContext())
     }
 
     private fun formatTime(value : Int) : String = String.format(Locale.getDefault(), "%02d", value)
@@ -71,4 +110,6 @@ class TimersFragment : Fragment() {
         @JvmStatic
         fun newInstance() = TimersFragment()
     }
+
+    private fun generateTimerId() : String = UUID.randomUUID().toString()
 }
